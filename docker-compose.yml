@@ -1,0 +1,45 @@
+services:
+  api:
+    build: .
+    container_name: chat-app-api
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DB=${MYSQL_DB}
+      - SECRET_KEY=${SECRET_KEY}
+    volumes:
+      - ./app:/app/app
+    networks:
+      - chat-network
+
+  db:
+    image: mysql:8.0
+    container_name: chat-app-db
+    restart: always
+    ports:
+      - "3307:3306"  # HostPort:ContainerPort
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER} 
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - chat-network
+    command: --default-authentication-plugin=mysql_native_password
+
+volumes:
+  mysql-data:
+
+networks:
+  chat-network:
+    driver: bridge

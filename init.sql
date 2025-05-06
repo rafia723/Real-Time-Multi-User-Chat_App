@@ -1,0 +1,38 @@
+CREATE DATABASE IF NOT EXISTS chat_app;
+USE chat_app;
+
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create chat_rooms table
+CREATE TABLE IF NOT EXISTS chat_rooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Create messages table
+CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    room_id INT NOT NULL,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE
+);
+
+-- Create revoked_tokens table
+CREATE TABLE IF NOT EXISTS revoked_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    jti VARCHAR(255) UNIQUE NOT NULL,
+    revoked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
